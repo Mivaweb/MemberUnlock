@@ -1,4 +1,4 @@
-# MemberUnlocked
+# MemberUnlock
 
 MemberUnlock is a Umbraco backoffice extension package which automatically unlock members after a period of time set in the config.
 
