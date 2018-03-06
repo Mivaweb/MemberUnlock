@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 using System.Xml;
 using umbraco.interfaces;
 using umbraco.IO;
@@ -43,32 +44,42 @@ namespace MemberUnlock.Install
 
         #region Private Methods
 
+        /// <summary>
+        /// Add new key to appSettings section in the webConfig file
+        /// </summary>
         private void ExecuteWebConfig()
         {
-            var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            var settings = configFile.AppSettings.Settings;
-
-            if(settings[APP_KEY] == null)
+            try
             {
-                settings.Add(APP_KEY, "10");
-            }
+                var configFile = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
+                var settings = configFile.AppSettings.Settings;
 
-            configFile.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+                if (settings[APP_KEY] == null)
+                {
+                    settings.Add(APP_KEY, "10");
+                    configFile.Save();
+                }
+            }
+            catch { }
         }
 
+        /// <summary>
+        /// Remove key from appSettings section in the webConfig file
+        /// </summary>
         private void UndoWebConfig()
         {
-            var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            var settings = configFile.AppSettings.Settings;
-
-            if (settings[APP_KEY] != null)
+            try
             {
-                settings.Remove(APP_KEY);
-            }
+                var configFile = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
+                var settings = configFile.AppSettings.Settings;
 
-            configFile.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+                if (settings[APP_KEY] != null)
+                {
+                    settings.Remove(APP_KEY);
+                    configFile.Save();
+                }
+            }
+            catch { }
         }
 
         #endregion
