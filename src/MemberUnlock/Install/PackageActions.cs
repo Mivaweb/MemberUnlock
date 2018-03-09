@@ -16,7 +16,9 @@ namespace MemberUnlock.Install
     /// </summary>
     public class PackageActions : IPackageAction
     {
-        private const string APP_KEY = "memberLockedOutInMinutes";
+        private const string APP_KEY_GUID = "memberUnlockAppKey";
+        private const string APP_KEY_TIMEOUT = "memberLockedOutInMinutes";
+        private Guid appKey;
 
         private static string UmbracoConfig
         {
@@ -33,6 +35,8 @@ namespace MemberUnlock.Install
 
         public bool Execute(string packageName, XmlNode xmlData)
         {
+            appKey = Guid.NewGuid();
+
             ExecuteUmbracoConfig();
             ExecuteWebConfig();
 
@@ -62,14 +66,25 @@ namespace MemberUnlock.Install
         {
             try
             {
+                bool saveFile = false;
+
                 var configFile = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
                 var settings = configFile.AppSettings.Settings;
 
-                if (settings[APP_KEY] == null)
+                if (settings[APP_KEY_TIMEOUT] == null)
                 {
-                    settings.Add(APP_KEY, "10");
-                    configFile.Save();
+                    settings.Add(APP_KEY_TIMEOUT, "10");
+                    saveFile = true;
                 }
+
+                if(settings[APP_KEY_GUID] == null)
+                {
+                    settings.Add(APP_KEY_GUID, appKey.ToString());
+                    saveFile = true;
+                }
+
+                // Save webConfig file
+                if (saveFile) configFile.Save();
             }
             catch { }
         }
@@ -93,7 +108,7 @@ namespace MemberUnlock.Install
             if(xnode != null)
             {
                 var xmlTask = new StringBuilder();
-                xmlTask.AppendLine("<task log=\"true\" alias=\"memberUnlock\" interval=\"60\" url=\"/umbraco/memberunlock/memberunlockapi/dounlock\" />");
+                xmlTask.AppendLine("<task log=\"true\" alias=\"memberUnlock\" interval=\"60\" url=\"/umbraco/memberunlock/memberunlockapi/dounlock?appkey="+ appKey + "\" />");
 
                 // Create xml document of the StringBuilder
                 XmlDocument xmlNodeToAdd = new XmlDocument();
@@ -119,14 +134,25 @@ namespace MemberUnlock.Install
         {
             try
             {
+                bool saveFile = false;
+
                 var configFile = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
                 var settings = configFile.AppSettings.Settings;
 
-                if (settings[APP_KEY] != null)
+                if (settings[APP_KEY_TIMEOUT] != null)
                 {
-                    settings.Remove(APP_KEY);
-                    configFile.Save();
+                    settings.Remove(APP_KEY_TIMEOUT);
+                    saveFile = true;
                 }
+
+                if(settings[APP_KEY_GUID] == null)
+                {
+                    settings.Remove(APP_KEY_GUID);
+                    saveFile = true;
+                }
+
+                // Save the webConfig file
+                if (saveFile) configFile.Save();
             }
             catch { }
         }

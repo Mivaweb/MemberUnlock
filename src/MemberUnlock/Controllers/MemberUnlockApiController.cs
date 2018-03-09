@@ -39,6 +39,24 @@ namespace MemberUnlock.Controllers
         }
 
         /// <summary>
+        /// Get the MemberUnlock APP Key from within the webConfig
+        /// </summary>
+        private Guid MemberUnlockAppKey
+        {
+            get
+            {
+                try
+                {
+                    return Guid.Parse(ConfigurationManager.AppSettings["memberUnlockAppKey"]);
+                }
+                catch
+                {
+                    return Guid.Empty;
+                }
+            }
+        }
+
+        /// <summary>
         /// Get the IMemberService
         /// </summary>
         private IMemberService MemberService
@@ -57,42 +75,46 @@ namespace MemberUnlock.Controllers
         /// <summary>
         /// Manual setting Member Test to locked out
         /// </summary>
-        //[HttpGet]
-        //public void SetLockedOut()
-        //{
-        //    var memberService = Services.MemberService;
-        //    var member = memberService.GetByKey(new Guid("fe41d912-39be-4514-89bb-5429d8137c26"));
-        //    member.IsLockedOut = true;
-        //    member.LastLockoutDate = DateTime.Now;
+        [HttpGet]
+        public void SetLockedOut()
+        {
+            var memberService = Services.MemberService;
+            var member = memberService.GetByKey(new Guid("fe41d912-39be-4514-89bb-5429d8137c26"));
+            member.IsLockedOut = true;
+            member.LastLockoutDate = DateTime.Now;
 
-        //    memberService.Save(member);
-        //}
+            memberService.Save(member);
+        }
 
         /// <summary>
         /// Get all locked members and check if there locked out period is expired
         /// If so, then unlock the member by setting `IsLockedOut` to false and reset the failedLoginAttempts
         /// </summary>
         [HttpGet]
-        public void DoUnlock()
+        public void DoUnlock(Guid appKey)
         {
-            // Get locked members
-            var lockedMembers = MemberService.GetMembersByPropertyValue("umbracoMemberLockedOut", true);
-
-            foreach (var member in lockedMembers)
+            // Do security check on AppKey
+            if(Guid.Equals(appKey, MemberUnlockAppKey))
             {
-                // Check if the locked out period is expired
-                if (LockedOutExpired(member))
+                // Get locked members
+                var lockedMembers = MemberService.GetMembersByPropertyValue("umbracoMemberLockedOut", true);
+
+                foreach (var member in lockedMembers)
                 {
-                    // Update member properties
-                    member.IsLockedOut = false;
-                    member.FailedPasswordAttempts = 0;
+                    // Check if the locked out period is expired
+                    if (LockedOutExpired(member))
+                    {
+                        // Update member properties
+                        member.IsLockedOut = false;
+                        member.FailedPasswordAttempts = 0;
 
-                    // Save Member
-                    MemberService.Save(member);
+                        // Save Member
+                        MemberService.Save(member);
 
-                    // Set log entry of the member that has been unlocked
-                    Logger.Info<MemberUnlockApiController>(
-                        String.Format("Member '{0}' has been unlocked automatically.", member.Username));
+                        // Set log entry of the member that has been unlocked
+                        Logger.Info<MemberUnlockApiController>(
+                            String.Format("Member '{0}' has been unlocked automatically.", member.Username));
+                    }
                 }
             }
         }
