@@ -93,7 +93,7 @@ namespace MemberUnlock.Install
             if(xnode != null)
             {
                 var xmlTask = new StringBuilder();
-                xmlTask.AppendLine("<task log=\"true\" alias=\"memberUnlock\" interval=\"60\" url=\"/umbraco/backoffice/memberunlock/memberunlockapi/dounlock\" />");
+                xmlTask.AppendLine("<task log=\"true\" alias=\"memberUnlock\" interval=\"60\" url=\"/umbraco/memberunlock/memberunlockapi/dounlock\" />");
 
                 // Create xml document of the StringBuilder
                 XmlDocument xmlNodeToAdd = new XmlDocument();

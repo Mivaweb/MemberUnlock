@@ -16,7 +16,7 @@ namespace MemberUnlock.Controllers
     /// Implement the MemberUnlockApiController
     /// </summary>
     [PluginController("MemberUnlock")]
-    public class MemberUnlockApiController : UmbracoAuthorizedApiController
+    public class MemberUnlockApiController : UmbracoApiController
     {
         /// <summary>
         /// Get the lockedOut time in minutes from the AppSettings with key `memberLockedOutInMinutes`
