@@ -75,16 +75,16 @@ namespace MemberUnlock.Controllers
         /// <summary>
         /// Manual setting Member Test to locked out
         /// </summary>
-        [HttpGet]
-        public void SetLockedOut()
-        {
-            var memberService = Services.MemberService;
-            var member = memberService.GetByKey(new Guid("fe41d912-39be-4514-89bb-5429d8137c26"));
-            member.IsLockedOut = true;
-            member.LastLockoutDate = DateTime.Now;
+        //[HttpGet]
+        //public void SetLockedOut()
+        //{
+        //    var memberService = Services.MemberService;
+        //    var member = memberService.GetByKey(new Guid("fe41d912-39be-4514-89bb-5429d8137c26"));
+        //    member.IsLockedOut = true;
+        //    member.LastLockoutDate = DateTime.Now;
 
-            memberService.Save(member);
-        }
+        //    memberService.Save(member);
+        //}
 
         /// <summary>
         /// Get all locked members and check if there locked out period is expired
