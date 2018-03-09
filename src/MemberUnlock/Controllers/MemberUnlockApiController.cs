@@ -91,7 +91,7 @@ namespace MemberUnlock.Controllers
         /// If so, then unlock the member by setting `IsLockedOut` to false and reset the failedLoginAttempts
         /// </summary>
         [HttpGet]
-        public void DoUnlock(Guid appKey)
+        public IHttpActionResult DoUnlock(Guid appKey)
         {
             // Do security check on AppKey
             if(Guid.Equals(appKey, MemberUnlockAppKey))
@@ -116,6 +116,12 @@ namespace MemberUnlock.Controllers
                             String.Format("Member '{0}' has been unlocked automatically.", member.Username));
                     }
                 }
+
+                return this.Ok();
+            }
+            else
+            {
+                return this.Unauthorized();
             }
         }
 
