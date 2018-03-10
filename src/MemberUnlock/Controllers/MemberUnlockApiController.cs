@@ -79,11 +79,17 @@ namespace MemberUnlock.Controllers
         //public void SetLockedOut()
         //{
         //    var memberService = Services.MemberService;
-        //    var member = memberService.GetByKey(new Guid("fe41d912-39be-4514-89bb-5429d8137c26"));
-        //    member.IsLockedOut = true;
-        //    member.LastLockoutDate = DateTime.Now;
 
-        //    memberService.Save(member);
+        //    string[] members = new string[] { "alex", "benoit", "marcin" };
+
+        //    foreach(var member in members)
+        //    {
+        //        var memberNode = memberService.GetByUsername(member);
+        //        memberNode.IsLockedOut = true;
+        //        memberNode.LastLockoutDate = DateTime.Now;
+
+        //        memberService.Save(memberNode);
+        //    }
         //}
 
         /// <summary>

@@ -107,20 +107,33 @@ namespace MemberUnlock.Install
 
             if(xnode != null)
             {
+                // Get authority domain
+                Uri currentUri = new Uri(System.Web.HttpContext.Current.Request.Url.AbsoluteUri);
+                string leftPart = currentUri.GetLeftPart(UriPartial.Authority);
+
                 var xmlTask = new StringBuilder();
-                xmlTask.AppendLine("<task log=\"true\" alias=\"memberUnlock\" interval=\"60\" url=\"/umbraco/memberunlock/memberunlockapi/dounlock?appkey="+ appKey + "\" />");
+                xmlTask.AppendLine(
+                    "<task log=\"true\" alias=\"memberUnlock\" interval=\"60\" url=\"" + 
+                    leftPart + 
+                    "/umbraco/memberunlock/memberunlockapi/dounlock?appkey=" + 
+                    appKey + 
+                    "\" />"
+                );
 
                 // Create xml document of the StringBuilder
                 XmlDocument xmlNodeToAdd = new XmlDocument();
                 xmlNodeToAdd.LoadXml(xmlTask.ToString());
 
+                // Get node to add
                 var nodeToAdd = xmlNodeToAdd.SelectSingleNode("*");
 
+                // Import the node into the configFile
                 xnode.AppendChild(xnode.OwnerDocument.ImportNode(nodeToAdd, true));
 
                 saveFile = true;
             }
 
+            // Save the configFile
             if(saveFile)
             {
                 xdoc.Save(configFile);
