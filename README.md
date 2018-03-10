@@ -13,11 +13,15 @@ Members in Umbraco can get locked out when they have entered to many wrong passw
 - Manually set the member back to not locked out 
 - When someone uses the password reset functionality they automatically get unlocked after updating their password
 
-But not everyone uses this last functionality or doesn't have the time to always manually set the member back to not locked out, that's way we created MemberUnlock.
+But not everyone uses this last functionality or doesn't have the time to always set the member manually back to not locked out, that's why we have created MemberUnlock.
 
-This package adds a new key into the appSettings of your web.config file called: memberLockedOutInMinutes. The default value of this property is 10 which means that locked out members stay locked out for at least 10 minutes.
+MemberUnlock is a tiny package which unlock members. When? After a time which you can set in the web.config. You will find a new key in the appSettings section of your web.config file called: memberLockedOutInMinutes. The default value of this property is 10 which means a locked out member will be locked out for 10 minutes, after that MemberUnlock will unlock this member.
 
-It also creates a scheduled task which runs every minute in order to check all locked out members and there locked out timeframe. Once the locked out tmeframe is expired, MemberUnlock will unlock them.
+During the installation of this package we also create a Scheduled Task which you can find in the umbracoSettings.config file. This task will run every minute in order to unlock the members that may get unlocked.
+
+If you want to view the history of these unlocked members by the MemberUnlock package, we alays add an entry in the log file like:
+
+`MemberUnlock.Controllers.MemberUnlockApiController - Member 'test' has been unlocked automatically.`
 
 
 ### History Version
