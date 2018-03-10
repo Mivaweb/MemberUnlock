@@ -19,7 +19,7 @@ MemberUnlock is a tiny package which unlock members. When? After a time which yo
 
 During the installation of this package we also create a Scheduled Task which you can find in the umbracoSettings.config file. This task will run every minute in order to unlock the members that may get unlocked.
 
-If you want to view the history of these unlocked members by the MemberUnlock package, we alays add an entry in the log file like:
+If you want to view the history of these unlocked members by the MemberUnlock package, we always add an entry in the log file like:
 
 `MemberUnlock.Controllers.MemberUnlockApiController - Member 'test' has been unlocked automatically.`
 
