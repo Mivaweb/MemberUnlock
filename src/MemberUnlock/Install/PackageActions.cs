@@ -71,15 +71,27 @@ namespace MemberUnlock.Install
                 var configFile = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
                 var settings = configFile.AppSettings.Settings;
 
+                // Add or update the `memberLockedOutInMinutes` appSettings key
                 if (settings[APP_KEY_TIMEOUT] == null)
                 {
                     settings.Add(APP_KEY_TIMEOUT, "10");
                     saveFile = true;
                 }
+                else
+                {
+                    settings[APP_KEY_TIMEOUT].Value = "10";
+                    saveFile = true;
+                }
 
-                if(settings[APP_KEY_GUID] == null)
+                // Add or update the `memberUnlockAppKey` appSettings key
+                if (settings[APP_KEY_GUID] == null)
                 {
                     settings.Add(APP_KEY_GUID, appKey.ToString());
+                    saveFile = true;
+                }
+                else
+                {
+                    settings[APP_KEY_GUID].Value = appKey.ToString();
                     saveFile = true;
                 }
 
@@ -103,6 +115,10 @@ namespace MemberUnlock.Install
             XmlDocument xdoc = new XmlDocument();
             xdoc.Load(configFile);
 
+            // Remove the old task
+            RemoveOldTask(xdoc);
+
+            // Get scheduledTasks node
             var xnode = xdoc.SelectSingleNode("//scheduledTasks");
 
             if(xnode != null)
@@ -158,7 +174,7 @@ namespace MemberUnlock.Install
                     saveFile = true;
                 }
 
-                if(settings[APP_KEY_GUID] == null)
+                if(settings[APP_KEY_GUID] != null)
                 {
                     settings.Remove(APP_KEY_GUID);
                     saveFile = true;
@@ -182,15 +198,29 @@ namespace MemberUnlock.Install
             XmlDocument xdoc = new XmlDocument();
             xdoc.Load(configFile);
 
+            if (RemoveOldTask(xdoc))
+            {
+                xdoc.Save(configFile);
+            }
+        }
+
+        /// <summary>
+        /// Remove the old task if present
+        /// </summary>
+        /// <param name="xdoc"></param>
+        /// <returns></returns>
+        private bool RemoveOldTask(XmlDocument xdoc)
+        {
             var xnode = xdoc.SelectSingleNode("//task [@alias='" + Alias() + "']");
 
             if (xnode != null)
             {
                 xdoc.SelectSingleNode("//scheduledTasks").RemoveChild(xnode);
-                xdoc.Save(configFile);
+                return true;
             }
-        }
 
+            return false;
+        }
         #endregion
     }
 }
